@@ -59,7 +59,7 @@ class Writers(Base):
     id = Column(Integer, autoincrement=True, primary_key=True, unique=True)
     url = Column(String, unique=True, nullable=False)
     name = Column(String, unique=False, nullable=False)
-    posts = relationship("Post")
+    posts = relationship("Posts")
 
 
 class Tags(Base):
@@ -67,7 +67,7 @@ class Tags(Base):
     id = Column(Integer, autoincrement=True, primary_key=True, unique=True)
     url = Column(String, unique=True, nullable=False)
     name = Column(String, unique=False, nullable=False)
-    posts = relationship('Post', secondary=tag_post)
+    posts = relationship('Posts', secondary=tag_post)
 
 
 class Comments(Base):
@@ -75,4 +75,4 @@ class Comments(Base):
     id = Column(Integer, autoincrement=True, primary_key=True, unique=True)
     author = Column(String, unique=False, nullable=False)
     comment = Column(String, unique=False, nullable=False)
-    posts = relationship('Post', secondary=comment_post)
+    posts = relationship('Posts', secondary=comment_post)

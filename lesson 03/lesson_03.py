@@ -1,3 +1,4 @@
+import datetime
 import bs4
 import requests
 from urllib.parse import urljoin
@@ -6,10 +7,10 @@ from db_geekbrains import DataBase
 
 class GbBlogParse:
 
-    def __init__(self, start_url: str, db: DataBase):
+    def __init__(self, start_url: str, db_obj: DataBase):
         self.start_url = start_url
         self.page_done = set()
-        self.db = db
+        self.db = db_obj
 
     def __get(self, url) -> bs4.BeautifulSoup:
         response = requests.get(url)
@@ -43,22 +44,24 @@ class GbBlogParse:
         # контент есть тут
         # tmp = soup.find('script', attrs={'type': 'application/ld+json'}).string
 
+        date_time_str = soup.find('div', attrs={'class': 'blogpost-date-views'}).find('time').get('datetime')
+        date_time_obj = datetime.datetime.strptime(date_time_str, "%Y-%m-%dT%H:%M:%S%z")
         data = {
             'post_data': {
                 'url': url,
                 'title': soup.find('h1').text,
                 'image': soup.find('div', attrs={'class': 'blogpost-content'}).find('img').get('src') if soup.find(
                     'div', attrs={'class': 'blogpost-content'}).find('img') else None,
-                'date': soup.find('div', attrs={'class': 'blogpost-date-views'}).find('time').get('datetime'),
+                'date': date_time_obj,
             },
             'writer': {'name': soup.find('div', attrs={'itemprop': 'author'}).text,
                        'url': urljoin(self.start_url,
                                       soup.find('div', attrs={'itemprop': 'author'}).parent.get('href'))},
 
             'tags': [],
-            'comments': [],
-
+            'comments': []
         }
+
         for tag in soup.find_all('a', attrs={'class': "small"}):
             tag_data = {
                 'url': urljoin(self.start_url, tag.get('href')),
@@ -66,27 +69,40 @@ class GbBlogParse:
             }
             data['tags'].append(tag_data)
 
-        print('Перед циклом')
-        for comment in soup.find_all('li', attrs={'class': "gb__comment-item"}):
-            print('Вошел')
+        comments_soup = soup.find('div', attrs={'class': 'm-t-xl'}).find('comments')
+        for comment in self.get_comments(comments_soup):
             comment_data = {
-                'url': urljoin(self.start_url, comment.get('href')),
-                'author': soup.find('gb__comment-item-header-user-data-name').text,
-                'comment': soup.find('js-comment-body-content').text
+                'id': comment.get('comment').get('id'),
+                'author': comment.get('comment').get('user').get('full_name'),
+                'comment': comment.get('comment').get('body')
             }
-            print(comment_data)
             data['comments'].append(comment_data)
 
         return data
 
+
     def get_comments(self, comments_soup):
+        headers = {
+            "User-Agent": "Mozilla / 5.0(Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0",
+        }
+
         if comments_soup:
-            print(1)
+            params = {
+                'commentable_type': comments_soup.get('commentable-type'),
+                'commentable_id': comments_soup.get('commentable-id'),
+                'order': comments_soup.get('order')
+            }
+            com_url = 'https://geekbrains.ru/api/v2/comments' #?commentable_type=Post&commentable_id=2455&order=desc'
+            response: requests.Response = requests.get(com_url, params=params, headers=headers)
+            if response.status_code != 200:
+                return []
+
+            comm_data = response.json()
+            return comm_data
 
     def save(self, page_data: dict):
         # print(page_data)
-        # self.db.create_post(page_data)
-        pass
+        self.db.create_post(page_data)
 
 
 if __name__ == '__main__':
