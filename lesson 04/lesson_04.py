@@ -13,7 +13,6 @@
 дополнительно попробуйте вытащить телефона
 '''
 
-<<<<<<< HEAD
 from scrapy.crawler import CrawlerProcess
 from scrapy.settings import Settings
 from gb_parse.spiders.autoyoula import AutoyoulaSpider
@@ -25,7 +24,3 @@ if __name__ == '__main__':
     crawl_proc = CrawlerProcess(settings=crawl_settings)
     crawl_proc.crawl(AutoyoulaSpider)
     crawl_proc.start()
-=======
-
-# Это только шаблон. Задание выполню чуть позже.
->>>>>>> origin/lesson_04
