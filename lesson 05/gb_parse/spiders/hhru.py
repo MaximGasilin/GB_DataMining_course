@@ -1,5 +1,5 @@
 import scrapy
-from ..loaders import HHVacancyLoader
+from ..loaders import HHVacancyLoader, HHCompanyLoader
 
 
 class HhruSpider(scrapy.Spider):
@@ -19,10 +19,11 @@ class HhruSpider(scrapy.Spider):
     }
     
     company_xpath = {
-        'name': '//h1/span[contains(@class, "company-header-title-name")]/text()',
-        'url': '//a[contains(@data-qa, "company-site")]/@href',
+        'name': '//h1/span[contains(@data-qa, "company-header-title-name")]/text()',
+        'web_site': '//a[contains(@data-qa, "company-site")]/@href',
         'description': '//div[contains(@data-qa, "company-description")]//text()',
-        
+        'fields_of_activity': '//div[contains(@class, "employer-sidebar-block")]//p/text()',
+
     }
     
     def parse(self, response, **kwargs):
@@ -42,18 +43,10 @@ class HhruSpider(scrapy.Spider):
         yield response.follow(response.xpath(self.vacancy_xpath['company_url']).get(), callback=self.company_parse)
     
     def company_parse(self, response, **kwargs):
-        item = []
-        if 1:
-            yield {}
-        else:
-            yield from self.company_parse_B(response, item=item)
-    
-    def company_parse_B(self, response, **kwargs):
-        if 1:
-            yield {}
-        else:
-            for r in self.company_parse_C(response):
-                yield r
-    
-    def company_parse_C(self, response, **kwargs):
-        yield {}
+        loader = HHCompanyLoader(response=response)
+        loader.add_value('url', response.url)
+        for key, value in self.company_xpath.items():
+            loader.add_xpath(key, value)
+
+        yield loader.load_item()
+

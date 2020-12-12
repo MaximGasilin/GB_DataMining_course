@@ -3,7 +3,7 @@ from scrapy import Selector
 from scrapy.loader import ItemLoader
 
 from itemloaders.processors import TakeFirst, MapCompose
-from .items import AutoYoulaItem, HHVacancyItem
+from .items import HHVacancyItem, HHCompanyItem
 
 
 def get_specifications(itm):
@@ -19,23 +19,6 @@ def get_specifications_out(data):
     return result
 
 
-def js_decoder_autor(text):
-    re_str = re.compile(r'youlaId%22%2C%22([0-9|a-zA-Z]+)%22%2C%22avatar')
-    result = re.findall(re_str, text)
-    return f'https://youla.ru/user/{result[0]}' if result else None
-
-
-class AutoYoulaLoader(ItemLoader):
-    default_item_class = AutoYoulaItem
-    url_out = TakeFirst()
-    title_out = TakeFirst()
-    description_out = TakeFirst()
-    autor_in = MapCompose(js_decoder_autor)
-    autor_out = TakeFirst()
-    specifications_in = MapCompose(get_specifications)
-    specifications_out = get_specifications_out
-
-
 class HHVacancyLoader(ItemLoader):
     default_item_class = HHVacancyItem
     title_out = TakeFirst()
@@ -44,3 +27,15 @@ class HHVacancyLoader(ItemLoader):
     description_out = TakeFirst()
     salary_in = ''.join
     salary_out = TakeFirst()
+
+
+class HHCompanyLoader(ItemLoader):
+    default_item_class = HHCompanyItem
+    name_in = ''.join
+    name_out = TakeFirst()
+    web_site_out = TakeFirst()
+    url_out = TakeFirst()
+    description_in = ''.join
+    description_out = TakeFirst()
+    # fields_of_activity_in = ''.join
+    # fields_of_activity_out = TakeFirst()

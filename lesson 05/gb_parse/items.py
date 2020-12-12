@@ -12,20 +12,20 @@ class GbParseItem(scrapy.Item):
     pass
 
 
-class AutoYoulaItem(scrapy.Item):
-    _id = scrapy.Field()
-    title = scrapy.Field()
-    images = scrapy.Field()
-    description = scrapy.Field()
-    url = scrapy.Field()
-    autor = scrapy.Field()
-    specifications = scrapy.Field()
-
 class HHVacancyItem(scrapy.Item):
     _id = scrapy.Field()
     url = scrapy.Field()
     title = scrapy.Field()
-    salary = scrapy.Field()
     description = scrapy.Field()
+    salary = scrapy.Field()
     skills = scrapy.Field()
     company_url = scrapy.Field()
+
+
+class HHCompanyItem(scrapy.Item):
+    _id = scrapy.Field()
+    url = scrapy.Field()
+    name = scrapy.Field()
+    description = scrapy.Field()
+    web_site = scrapy.Field()
+    fields_of_activity = scrapy.Field()
