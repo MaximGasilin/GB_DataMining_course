@@ -1,6 +1,7 @@
 import datetime as dt
 import json
 import scrapy
+import requests
 from ..items import InstaTag, InstaPost
 
 
@@ -72,8 +73,18 @@ class InstagramSpider(scrapy.Spider):
         yield from self.get_post_item(tag['edge_hashtag_to_media']['edges'])
 
     @staticmethod
+    def get_image_from_insta(display_url, id):
+        response_img: requests.Response = requests.get(display_url)
+        if response_img.status_code != 200:
+            pass
+        else:
+            with open(f"images/{id}.jpg", "wb") as out_file:
+                out_file.write(response_img.content)
+
+    @staticmethod
     def get_post_item(edges):
         for node in edges:
+            InstagramSpider.get_image_from_insta(node['node']['display_url'], node['node']['id'])
             yield InstaPost(
                 date_parse=dt.datetime.utcnow(),
                 data=node['node']
@@ -83,3 +94,5 @@ class InstagramSpider(scrapy.Spider):
     def js_data_extract(response):
         script = response.xpath('//script[contains(text(), "window._sharedData =")]/text()').get()
         return json.loads(script.replace("window._sharedData =", '')[:-1])
+
+
