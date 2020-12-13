@@ -3,8 +3,6 @@ from scrapy import Selector
 from scrapy.loader import ItemLoader
 
 from itemloaders.processors import TakeFirst, MapCompose
-from .items import AutoYoulaItem, HHVacancyItem
-
 
 def get_specifications(itm):
     tag = Selector(text=itm)

@@ -16,8 +16,8 @@ class GbParsePipeline:
         self.db = MongoClient()['parse_13']
     
     def process_item(self, item, spider):
-        collection = self.db[spider.name]
-        collection.insert_one(item)
+        # collection = self.db[spider.name]
+        # collection.insert_one(item)
         return item
 
 
@@ -29,5 +29,5 @@ class GbImagePipeline(ImagesPipeline):
             yield Request(image)
     
     def item_completed(self, results, item, info):
-        item['images'] = [itm[1] for itm in results]
+        item['img'] = [itm[1] for itm in results]
         return item

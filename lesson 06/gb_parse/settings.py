@@ -18,7 +18,7 @@ NEWSPIDER_MODULE = 'gb_parse.spiders'
 IMAGES_STORE = 'images'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:83.0) Gecko/20100101 Firefox/83.0'
+USER_AGENT = 'Mozilla / 5.0(Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
