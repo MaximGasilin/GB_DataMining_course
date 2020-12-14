@@ -16,8 +16,8 @@ class GbParsePipeline:
         self.db = MongoClient()['parse_13']
     
     def process_item(self, item, spider):
-        # collection = self.db[spider.name]
-        # collection.insert_one(item)
+        collection = self.db[spider.name]
+        collection.insert_one(item)
         return item
 
 
